@@ -43,7 +43,10 @@ class MultiHTTPCheck < Sensu::Plugin::Check::CLI
 
   def parse_response(response)
   	check_name = response.request.url.gsub('http://', '').gsub('https://', '').gsub('/', '-')
-    if ( response.code == 200 )
+
+    if( response.request.timed_out? )
+      send_warning "WEB_#{check_name}", "#{response.request.url} TIMED OUT"
+    elsif ( response.code == 200 )
       send_ok "WEB_#{check_name}", "#{response.request.url} is returning #{response.code}"
     else
       send_critical "WEB_#{check_name}", "#{response.request.url} is returning #{response.code}"
@@ -51,10 +54,6 @@ class MultiHTTPCheck < Sensu::Plugin::Check::CLI
 
 	end
 
-   def process_timeout(response)
-  	check_name = response.request.url.gsub('http://', '').gsub('https://', '').gsub('/', '-')
-    send_warning "WEB_#{check_name}", "#{response.request.url} is returning #{response.code}"
-   end
 
   def run
     hydra = Typhoeus::Hydra.new(max_concurrency: config[:concurrence])
