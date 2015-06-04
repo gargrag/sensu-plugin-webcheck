@@ -63,7 +63,6 @@ class MultiHTTPCheck < Sensu::Plugin::Check::CLI
       url = url.gsub("\n", '')
       request = Typhoeus::Request.new(url, followlocation:true, cache_ttl:0)
       request.on_complete{ |response| parse_response(response) }
-      request.on_timeout{ |response| process_timeout(response) }
       hydra.queue(request)
     end
 
