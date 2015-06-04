@@ -45,7 +45,7 @@ class MultiHTTPCheck < Sensu::Plugin::Check::CLI
   def parse_response(response)
   	check_name = response.request.url.gsub('http://', '').gsub('https://', '').gsub('/', '-')
 
-    if( response.request.timed_out? )
+    if( response.timed_out? )
       send_warning "WEB_#{check_name}", "#{response.request.url} TIMED OUT"
     elsif ( response.code == 200 )
       send_ok "WEB_#{check_name}", "#{response.request.url} is returning #{response.code}"
